@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>    
+    <meta charset="UTF-8">
+    <title>Vue Todo Tutorial</title>
+    <style>
+        .empty {
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-bind:class="{empty: !count}" v-model="value"> 
+        <!-- 绑定值用 v-bind 指令，为 input 的 class 绑定一个值：Vue 会根据 empty 后的表达式！count 的真假来判断 class 的值是否为 empty，如果为真（即 count = 0 的情况），则 class 的值为 empty，否则为空。 -->
+        <input type="button" value="发送" v-on:click="send"/>
+        <!-- 在按钮上使用v-on，绑定一个 click 事件 -->
+        <div v-if="count">value 的值是:{{ value }}</div>
+        <!--  v-if 指令用于条件渲染元素，仅当 v-if 后面的表达式为真时，元素才被渲染,这里 count 是我们定义的计算属性，其值为 value 的长度，正好作为 v-if 的逻辑表达式，仅当 value 有值时，count 才非零（视为真），否则 count 为零（视为假，div 不被渲染）。 -->
+        <div>字数：{{ count }}</div>
+        <!-- 引用 count -->
+    </div>
+</body>
+<script src="http://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+<script>
+    var app = new Vue({
+        //告诉 Vue 挂载的元素（el，即 elements 的缩写）是 id 为 app 的那个 div，并且在 data 中绑定了一个函数
+        el: "#app",
+        data: function () {
+            return {value: ""}
+        },
+        //添加一个方法，methods，点击发送按钮后显示一个发送成功的消息，然后将 value 的值清空
+        methods: {
+            send: function () {
+                if (!this.count){//当用户点击发送按钮，检测到 input 中没有输入任何值时，直接弹框提示并返回，只有有值才执行后续逻辑
+                    alert("内容为空，请输入内容！");
+                    return
+                }
+                alert('发送成功！');
+                this.value = ''
+            }
+        },
+        //添加计算属性
+        computed: {
+            count: function () {
+                return this.value.length
+            }
+        }//计算属性申明到 computed 对象里，这个对象的键是计算的结果，值是计算函数，这里计算了 value 的长度。以后在 Vue 对象中就可以使用 this.count 引用计算结果，也可以在关联的模板中直接引用，和绑定的数据 value 的用法非常类似。
+    })
+</script>
+</html>

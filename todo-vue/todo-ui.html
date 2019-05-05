@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue Todo</title>
+    <style>
+    .completed {
+        text-decoration: line-through;
+    }
+    .selected {
+        color:red;
+    }
+    .empty {
+        border-color: red;
+    }
+    </style>
+</head>
+<body>
+    <div id="todo-app">
+        <div>
+            <input type="button" value="全部标记为完成">
+            <input type="text" 
+                    v-bind:class="{empty: emptyChecked}"
+                    placeholder="添加 todo" 
+                    v-model="newTodoTitle" 
+                    @keyup.enter="addTodo"/>
+            <!-- 使用 v-model 指令将 input 的 value 值和 Vue 的实例绑定，这样在 Vue 中我们就知道了用户输入的值。然后我们监听用户按下回车的事件，一旦这个事件被触发，我们就在 Vue 实例中调用相应的方法 -->
+            <!-- 注意 @keyup.enter="addTodo"，我们之前的示例中绑定过 click 事件，绑定键盘按键的事件为 keyup，然后我们使用 enter 对事件进行修饰，表明这个事件是按下回车，而不是按下别的什么键。Vue 为按键提供了很多修饰符，可以参考 Vue 按键修饰符的官方文档。事件绑定后，一旦用户按下回车，就会调用后边的 addTodo 方法。 -->
+            <span v-if="emptyChecked" style="color: red">请输入内容！</span>
+            <!-- 新增的 v-bind:class='{empty: emptyChecked}'，只要 emptyChecked 的值为 true，则应用 empty 样式，且 v-if 条件满足，提示信息显示。 -->
+        </div>
+        <!-- todo list -->
+        <ul>
+            <li v-for="todo in todos" :key="todo.id">
+                <span >{{ todo.title }}</span>
+                <input type="button" value="标记为已完成">
+                <input type="button" value="删除">
+                <input type="text" value="编辑 todo...">
+                <!-- v-for='todo in todos' 这种写法，其含义就是循环 todos 列表，将列表的每一项保存到 todo 变量，循环渲染 li 元素的内容。特别注意我们还给 li 元素绑定了一个 key 属性，这将告诉 Vue 每个渲染的 li 元素都是不同的，因为 id 不同。 -->
+            </li>
+        </ul>
+        <!-- end todo list -->
+    <div>
+        <span>剩余 3项未完成 ---</span>
+        <span>筛选：
+            <input type="button" class="selected" value="全部">
+            <input type="button" value="进行中">
+            <input type="button" value="已完成">
+            <input type="button" value="清除已完成">
+            <input type="button" value="清除全部">
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+    <script>
+        let id = 0;
+        var app = new Vue({
+            // app 是我们创建的 Vue 实例的名字，然后引用它绑定的数据 todos，我们给它赋了一个新的值，然后你会实时地看到浏览器渲染的结果变化了
+            el: "#todo-app",
+            data: function () {
+                return {
+                    todos: [],
+                    newTodoTitle:"",
+                    //用 v-model 指令将 input 的 value 属性的值与 Vue 实例的 newTodoTitle 值绑定。注意这里绑定的数据可以取任何名字，不一定要和 input 的属性 value 相同。
+                    checkEmpty: false,
+                    //增加一个检查空值标志添加一个标志字段 checkEmpty，初始化时为 false，表明无需检查空值，当用户按下回车添加 todo 是，checkEmpty 变为 true，表明需要检查空值
+                    todo = {id:1,title:"todo",completed:false}
+                }
+            },
+            methods: {
+                addTodo: function () {
+                    if (this.newTodoTitle === "") {
+                        this.checkEmpty = true;
+                        return
+                    }
+                    // 在 addTodo 方法中判断用户的输入，若为空则直接返回，什么都不做
+                    this.todos.push({id: id++, title: this.newTodoTitle,completed:false});
+                    this.newTodoTitle = "";
+                    this.checkEmpty = false;
+                    //方法声明在 Vue 对象的 methods 属性里。这个 addTodo 方法做的事情很简单，生成一个新的 todo 对象，然后将其添加到 todos 列表里（push 方法就是把一个元素加入到数组的末尾），然后将用户的输入值清空。始终注意这里 newTodoTitle 和输入框的 value 值是双向绑定的，任何一个值改变，相应的值都会跟着变。
+                }
+            },
+            computed: {
+                emptyChecked: function () {
+                    return this.newTodoTitle.length === 0 && this.checkEmpty
+                }//添加一个计算属性判断用户输入是否为空, emptyChecked 的逻辑没有太大变化，只是其值会根据 newTodoTitle 和 checkEmpty 来改变，如果无需 checkEmpty ，则其总是假。checkEmpty 只有在用户按下回车时为 true，其它时候都是假。
+            }
+        })
+    </script>
+</body>
+</html>
